@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Overdrive - Definitive Edition</title>
+    <style>
+        :root {
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-purple: #9d00ff;
+            --neon-green: #39ff14;
+            --neon-gold: #ffd700;
+            --neon-red: #ff3333;
+            --bg-dark: #080810;
+            --card-bg: rgba(20, 20, 35, 0.5);
+            
+            /* Variáveis dinâmicas para customização */
+            --crystal-gradient: linear-gradient(135deg, #00bdff 0%, #003366 40%, #7a00ff 100%);
+            --crystal-shadow: rgba(0, 240, 255, 0.6);
+            --crystal-clip: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            outline: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(255, 0, 127, 0.05) 0%, transparent 40%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: filter 0.1s;
+        }
+
+        /* JUICE: Tremor de tela */
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-active { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake-hard { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; filter: brightness(1.2); }
+
+        .game-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* PAINEL ESQUERDO */
+        .crystal-zone {
+            flex: 1.3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4vh 2vw;
+            position: relative;
+            min-width: 0;
+        }
+
+        #trail-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ANOMALIA ESTELAR (EVENTO) */
+        #anomaly {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #fff 0%, var(--neon-gold) 50%, #ff8800 100%);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            filter: drop-shadow(0 0 20px var(--neon-gold));
+            animation: spinPulse 2s linear infinite;
+        }
+        @keyframes spinPulse {
+            0% { transform: rotate(0deg) scale(0.9); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(0.9); }
+        }
+
+        .hud { text-align: center; z-index: 10; position: relative; width: 100%; }
+
+        /* Controles Top-Left */
+        .top-controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .control-btn:hover { background: rgba(255,255,255,0.1); }
+        .btn-danger { border-color: rgba(255,51,51,0.5); color: #ff8888; }
+        .btn-danger:hover { background: rgba(255,51,51,0.2); }
+
+        /* ESTATÍSTICAS TOP-RIGHT */
+        .stats-panel {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(10,10,18,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #8888a0;
+            text-align: right;
+            z-index: 100;
+        }
+        .stats-panel span { color: #fff; font-weight: bold; }
+
+        #score-container {
+            font-size: clamp(2.2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px var(--neon-blue);
+            font-family: 'Courier New', monospace;
+            line-height: 1.1;
+            word-break: break-all;
+            padding: 0 10px;
+        }
+
+        #cps-container { font-size: clamp(0.85rem, 2vw, 1.1rem); color: #8888a0; margin-top: 6px; letter-spacing: 1px; }
+        #cps { color: var(--neon-green); font-weight: bold; text-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+        #shards-container { font-size: clamp(0.8rem, 1.8vw, 1rem); color: var(--neon-gold); margin-top: 4px; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+
+        #active-buff {
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            color: var(--neon-gold);
+            font-weight: bold;
+            margin-top: 8px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px var(--neon-gold);
+            height: 25px;
+            animation: pulseText 1s infinite alternate;
+        }
+        @keyframes pulseText { from { opacity: 0.8; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
+
+        .overdrive-wrapper {
+            width: min(100%, 280px); background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 14px; border-radius: 10px; margin-top: 12px;
+            overflow: hidden; position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            margin-left: auto; margin-right: auto;
+        }
+        .overdrive-bar {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-blue); transition: width 0.1s ease;
+        }
+        .overdrive-text {
+            font-size: 0.7rem; font-weight: bold; color: #fff;
+            position: absolute; width: 100%; text-align: center;
+            top: -1px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 1px 2px #000;
+        }
+
+        .crystal-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; width: 100%; padding: 20px 0; }
+
+        #cristal {
+            width: clamp(140px, 35vh, 240px); 
+            height: clamp(140px, 35vh, 240px);
+            background: var(--crystal-gradient);
+            clip-path: var(--crystal-clip);
+            cursor: pointer;
+            transition: transform 0.05s ease, filter 0.3s ease;
+            filter: drop-shadow(0 0 35px var(--crystal-shadow));
+            animation: floating 5s ease-in-out infinite;
+        }
+        #cristal:active { transform: scale(0.90) rotate(2deg); }
+
+        @keyframes floating { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+
+        body.overdrive-active .overdrive-bar {
+            background: linear-gradient(90deg, var(--neon-pink), #ff0000);
+            box-shadow: 0 0 15px var(--neon-pink);
+            animation: pulseBar 0.5s infinite alternate;
+        }
+        body.overdrive-active #cristal {
+            background: linear-gradient(135deg, var(--neon-pink) 0%, #550022 40%, #ff5500 100%) !important;
+            filter: drop-shadow(0 0 50px var(--neon-pink)) !important;
+            animation: floating 1s ease-in-out infinite, shake 0.5s infinite;
+        }
+        body.overdrive-active #score-container { color: #fff; text-shadow: 0 0 30px var(--neon-pink), 0 0 60px rgba(255,0,127,0.6); }
+
+        @keyframes pulseBar { 0% { filter: brightness(1); } 100% { filter: brightness(1.5); } }
+
+        .combo-meter { font-size: clamp(1rem, 2.5vw, 1.4rem); color: #ffcc00; font-weight: 800; height: 20px; margin-top: 8px; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
+
+        .floating-number {
+            position: absolute; pointer-events: none;
+            font-weight: 900; font-size: clamp(1.2rem, 3vw, 1.8rem); font-family: Arial, sans-serif;
+            animation: microFloat 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; z-index: 100;
+        }
+        .floating-number.crit {
+            font-size: clamp(2rem, 5vw, 3rem); color: var(--neon-gold) !important;
+            text-shadow: 0 0 20px var(--neon-gold), 0 0 40px #ff8800 !important;
+            animation: critFloat 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; z-index: 101;
+        }
+        @keyframes microFloat { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; transform: translateY(-20px) scale(1.1); } 100% { transform: translateY(-80px) scale(0.8); opacity: 0; } }
+        @keyframes critFloat { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 15% { opacity: 1; transform: translateY(-30px) scale(1.4); } 100% { transform: translateY(-120px) scale(1); opacity: 0; } }
+
+        /* SISTEMA DE NOTIFICAÇÕES (ACHIEVEMENTS) */
+        #toast-container {
+            position: fixed; bottom: 20px; right: 20px;
+            display: flex; flex-direction: column-reverse; gap: 10px; z-index: 9999;
+            pointer-events: none; max-width: 320px;
+        }
+        .toast {
+            background: rgba(15, 15, 25, 0.95); border: 1px solid rgba(255,255,255,0.1);
+            border-left: 5px solid var(--neon-gold); color: white;
+            padding: 12px 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+            animation: slideInToast 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, fadeOutToast 0.5s 4s forwards;
+        }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-content h4 { margin: 0; font-size: 0.9rem; color: var(--neon-gold); text-transform: uppercase; }
+        .toast-content p { margin: 2px 0 0; font-size: 0.8rem; color: #ccc; }
+        @keyframes slideInToast { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOutToast { to { transform: translateY(-20px); opacity: 0; } }
+
+        /* PAINEL DIREITO (LOJA) */
+        .shop-panel {
+            width: 440px; background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex; flex-direction: column; padding: 20px;
+            min-width: 0;
+        }
+
+        .shop-tabs { display: flex; gap: 6px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .tab-btn {
+            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #8888a0; padding: 8px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab-btn.active { background: var(--neon-purple); color: white; border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(157, 0, 255, 0.5); }
+        .tab-btn.ascension { color: var(--neon-red); border-color: rgba(255,51,51,0.3); }
+        .tab-btn.active.ascension { background: var(--neon-red); border-color: #ff8888; box-shadow: 0 0 15px var(--neon-red); color: white;}
+
+        .shop-content { flex: 1; overflow-y: auto; display: none; padding-right: 4px; }
+        .shop-content.active { display: block; }
+        .shop-content::-webkit-scrollbar { width: 5px; }
+        .shop-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .shop-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .shop-item {
+            background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px; padding: 12px 16px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.2s ease; position: relative;
+            gap: 10px;
+        }
+        .shop-item.click-type { border-left: 4px solid var(--neon-blue); }
+        .shop-item.auto-type { border-left: 4px solid var(--neon-green); }
+        .shop-item.skin-type { border-left: 4px solid var(--neon-pink); }
+        .shop-item.trail-type { border-left: 4px solid var(--neon-gold); }
+        .shop-item:hover:not(.disabled) { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); transform: translateX(-3px); }
+        .shop-item.disabled { opacity: 0.3; cursor: not-allowed; }
+        .shop-item.equipped { border: 1px solid rgba(0, 240, 255, 0.5) !important; background: rgba(0, 240, 255, 0.1) !important; }
+
+        .item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .item-tag { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+        .click-type .item-tag { color: var(--neon-blue); } .auto-type .item-tag { color: var(--neon-green); }
+        .skin-type .item-tag { color: var(--neon-pink); } .trail-type .item-tag { color: var(--neon-gold); }
+
+        .item-name { font-weight: 700; font-size: clamp(0.95rem, 2.2vw, 1.05rem); color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item-desc { font-size: 0.75rem; color: #888895; margin-top: 1px; }
+        .item-cost { font-size: 0.85rem; color: #fff; font-weight: bold; margin-top: 4px; font-family: monospace; }
+        .cost-shard { color: var(--neon-gold); }
+        .cosmetic-bonus { font-size: 0.7rem; color: var(--neon-green); font-weight: bold; margin-top: 2px; }
+        
+        .milestone-badge { position: absolute; top: -8px; right: -3px; background: var(--neon-purple); font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; box-shadow: 0 0 5px var(--neon-purple); display: none; z-index: 10; }
+        .item-count { font-size: clamp(1.1rem, 2.5vw, 1.3rem); font-weight: 800; color: rgba(255,255,255,0.15); font-family: monospace; flex-shrink: 0; }
+        .shop-item:hover:not(.disabled) .item-count { color: #fff; }
+
+        .prestige-header { text-align: center; margin-bottom: 15px; padding: 15px; background: rgba(255, 51, 51, 0.1); border: 1px solid rgba(255, 51, 51, 0.3); border-radius: 10px; }
+        .prestige-title { color: var(--neon-red); font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 51, 51, 0.5); }
+        .prestige-desc { font-size: 0.8rem; color: #ccc; margin-top: 8px; }
+        .prestige-btn { background: linear-gradient(45deg, #660000, #ff0000); color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 12px; box-shadow: 0 0 15px rgba(255,0,0,0.4); transition: 0.3s; }
+        .prestige-btn:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(255,0,0,0.8); }
+        .prestige-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
+        .chip-display { font-size: 1.05rem; text-align: center; color: var(--neon-blue); font-weight: bold; margin-top: 15px; background: rgba(0,240,255,0.1); padding: 10px; border-radius: 8px; }
+
+        /* RESPONSIVIDADE ULTRA ADAPTÁVEL (MEDIA QUERIES) */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .game-container { flex-direction: column; height: auto; }
+            .crystal-zone { height: 70vh; min-height: 480px; flex: none; width: 100%; padding: 30px 15px; }
+            .shop-panel { width: 100%; height: 50vh; min-height: 400px; border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+            #toast-container { left: 50%; bottom: 20px; right: auto; transform: translateX(-50%); width: calc(100% - 40px); }
+            @keyframes slideInToast { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        }
+
+        @media (max-width: 480px) {
+            .top-controls { top: 10px; left: 10px; gap: 6px; }
+            .control-btn { padding: 4px 8px; font-size: 0.75rem; }
+            .stats-panel { top: 10px; right: 10px; padding: 6px 10px; font-size: 0.65rem; }
+            .crystal-zone { height: 65vh; min-height: 400px; }
+            #cristal { width: 140px; height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="game-container">
+        <div class="crystal-zone" id="crystal-zone">
+            
+            <div class="top-controls">
+                <button class="control-btn" id="btn-sound" onclick="toggleSound()">🔇 Som</button>
+                <button class="control-btn btn-danger" onclick="hardReset()">Limpar Save</button>
+            </div>
+
+            <div class="stats-panel">
+                Cliques: <span id="stat-clicks">0</span><br>
+                Críticos: <span id="stat-crits">0</span>
+            </div>
+
+            <canvas id="trail-canvas"></canvas>
+            <div id="anomaly" onclick="clickAnomaly(event)"></div>
+
+            <div class="hud">
+                <div id="score-container"><span id="score">0</span></div>
+                <div id="cps-container">Ganhos Automáticos: <span id="cps">0.0</span>/s</div>
+                <div id="shards-container">🌌 Fragmentos: <span id="shards">0</span></div>
+                
+                <div id="active-buff"></div>
+                
+                <div class="overdrive-wrapper">
+                    <div class="overdrive-bar" id="od-bar"></div>
+                    <div class="overdrive-text" id="od-text">Carregando Overdrive</div>
+                </div>
+
+                <div id="combo-display" class="combo-meter"></div>
+            </div>
+
+            <div class="crystal-wrapper">
+                <div id="cristal"></div>
+            </div>
+        </div>
+
+        <div class="shop-panel">
+            <div class="shop-tabs">
+                <button class="tab-btn active" onclick="switchTab('upgrades')">Sistemas</button>
+                <button class="tab-btn" onclick="switchTab('cosmetics')">Estilo</button>
+                <button class="tab-btn ascension" onclick="switchTab('prestige')">Ascensão</button>
+            </div>
+            
+            <div class="shop-content active" id="tab-upgrades">
+                <div class="shop-item disabled click-type" id="upgrade-click1" onclick="buyUpgrade('click1')">
+                    <div class="milestone-badge" id="badge-click1">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Laser de Impacto</span><span class="item-desc">+1 Base / Sinergia (2%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click1">10</span></span></div><div class="item-count" id="count-click1">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click2" onclick="buyUpgrade('click2')">
+                    <div class="milestone-badge" id="badge-click2">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Manopla Cinética</span><span class="item-desc">+8 Base / Sinergia (5%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click2">250</span></span></div><div class="item-count" id="count-click2">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click3" onclick="buyUpgrade('click3')">
+                    <div class="milestone-badge" id="badge-click3">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Amplificador Quântico</span><span class="item-desc">+50 Base / Sinergia (8%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click3">2500</span></span></div><div class="item-count" id="count-click3">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click4" onclick="buyUpgrade('click4')">
+                    <div class="milestone-badge" id="badge-click4">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Canhão de Grávitons</span><span class="item-desc">+250 Base / Sinergia (12%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click4">15000</span></span></div><div class="item-count" id="count-click4">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click5" onclick="buyUpgrade('click5')">
+                    <div class="milestone-badge" id="badge-click5">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Foco Prismático</span><span class="item-desc">+1.2K Base / Sinergia (18%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click5">100000</span></span></div><div class="item-count" id="count-click5">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click6" onclick="buyUpgrade('click6')">
+                    <div class="milestone-badge" id="badge-click6">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Lente de Singularidade</span><span class="item-desc">+8K Base / Sinergia (25%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click6">800000</span></span></div><div class="item-count" id="count-click6">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click7" onclick="buyUpgrade('click7')">
+                    <div class="milestone-badge" id="badge-click7">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Ressonador de Táquions</span><span class="item-desc">+45K Base / Sinergia (35%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click7">5000000</span></span></div><div class="item-count" id="count-click7">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click8" onclick="buyUpgrade('click8')">
+                    <div class="milestone-badge" id="badge-click8">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Disruptor Dimensional</span><span class="item-desc">+300K Base / Sinergia (50%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click8">40000000</span></span></div><div class="item-count" id="count-click8">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click9" onclick="buyUpgrade('click9')">
+                    <div class="milestone-badge" id="badge-click9">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Matriz de Antimatéria</span><span class="item-desc">+2.5M Base / Sinergia (70%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click9">350000000</span></span></div><div class="item-count" id="count-click9">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click10" onclick="buyUpgrade('click10')">
+                    <div class="milestone-badge" id="badge-click10">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Lâmina do Vazio</span><span class="item-desc">+20M Base / Sinergia (100%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click10">3000000000</span></span></div><div class="item-count" id="count-click10">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click11" onclick="buyUpgrade('click11')">
+                    <div class="milestone-badge" id="badge-click11">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Colisor de Realidades</span><span class="item-desc">+150M Base / Sinergia (150%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click11">25000000000</span></span></div><div class="item-count" id="count-click11">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click12" onclick="buyUpgrade('click12')">
+                    <div class="milestone-badge" id="badge-click12">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Dedo de Deus</span><span class="item-desc">+1.2B Base / Sinergia (250%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click12">250000000000</span></span></div><div class="item-count" id="count-click12">0</div>
+                </div>
+
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;">
+
+                <div class="shop-item disabled auto-type" id="upgrade-auto1" onclick="buyUpgrade('auto1')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Extrator Estático</span><span class="item-desc">+1.0 ponto/segundo</span><span class="item-cost">Custo: <span id="cost-auto1">50</span></span></div><div class="item-count" id="count-auto1">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto2" onclick="buyUpgrade('auto2')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Reator de Plasma</span><span class="item-desc">+15.0 pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto2">800</span></span></div><div class="item-count" id="count-auto2">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto3" onclick="buyUpgrade('auto3')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Nuvem Cronométrica</span><span class="item-desc">+200.0 pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto3">12000</span></span></div><div class="item-count" id="count-auto3">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto4" onclick="buyUpgrade('auto4')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Sifão de Matéria Escura</span><span class="item-desc">+1.5K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto4">150000</span></span></div><div class="item-count" id="count-auto4">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto5" onclick="buyUpgrade('auto5')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Forja Estelar</span><span class="item-desc">+10K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto5">1200000</span></span></div><div class="item-count" id="count-auto5">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto6" onclick="buyUpgrade('auto6')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Esfera de Dyson</span><span class="item-desc">+100K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto6">15000000</span></span></div><div class="item-count" id="count-auto6">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto7" onclick="buyUpgrade('auto7')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Motor de Curvatura</span><span class="item-desc">+1M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto7">200000000</span></span></div><div class="item-count" id="count-auto7">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto8" onclick="buyUpgrade('auto8')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Fenda Subespacial</span><span class="item-desc">+12M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto8">2500000000</span></span></div><div class="item-count" id="count-auto8">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto9" onclick="buyUpgrade('auto9')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Buraco Negro Artificial</span><span class="item-desc">+150M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto9">35000000000</span></span></div><div class="item-count" id="count-auto9">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto10" onclick="buyUpgrade('auto10')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Nexus de Multiversos</span><span class="item-desc">+2B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto10">500000000000</span></span></div><div class="item-count" id="count-auto10">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto11" onclick="buyUpgrade('auto11')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Tecelão do Tempo</span><span class="item-desc">+30B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto11">8000000000000</span></span></div><div class="item-count" id="count-auto11">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto12" onclick="buyUpgrade('auto12')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Colhedor de Galáxias</span><span class="item-desc">+500B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto12">150000000000000</span></span></div><div class="item-count" id="count-auto12">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto13" onclick="buyUpgrade('auto13')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Entropia Final</span><span class="item-desc">+8T pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto13">3000000000000000</span></span></div><div class="item-count" id="count-auto13">0</div>
+                </div>
+            </div>
+
+            <div class="shop-content" id="tab-cosmetics">
+                <div class="shop-item skin-type equipped" id="cosmetic-skin_default" onclick="selectCosmetic('skin', 'default')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Cristal Padrão</span><span class="item-desc">A energia azul clássica.</span><div class="cosmetic-bonus">Sem bónus</div><span class="item-cost">Adquirido</span></div><div class="item-count">★</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_ruby" onclick="selectCosmetic('skin', 'ruby')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Rubi de Sangue</span><span class="item-desc">Forjado no calor de estrelas moribundas.</span><div class="cosmetic-bonus">+5% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">5 Fragmentos</span></span></div><div class="item-count">✦</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_emerald" onclick="selectCosmetic('skin', 'emerald')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Esmeralda Vital</span><span class="item-desc">Irradia pura energia de crescimento.</span><div class="cosmetic-bonus">+10% Poder de Clique Base</div><span class="item-cost">Custo: <span class="cost-shard">15 Fragmentos</span></span></div><div class="item-count">◇</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_void" onclick="selectCosmetic('skin', 'void')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Fragmento do Vazio</span><span class="item-desc">Consome a luz ao seu redor.</span><div class="cosmetic-bonus">+15% Multiplicador Crítico</div><span class="item-cost">Custo: <span class="cost-shard">40 Fragmentos</span></span></div><div class="item-count">👁</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_nebula" onclick="selectCosmetic('skin', 'nebula')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Nébula Estelar</span><span class="item-desc">Uma galáxia inteira condensada.</span><div class="cosmetic-bonus">+8% CPS Global</div><span class="item-cost">Custo: <span class="cost-shard">120 Fragmentos</span></span></div><div class="item-count">🪐</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_chronos" onclick="selectCosmetic('skin', 'chronos')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Cristal Temporal</span><span class="item-desc">Distorce o fluxo do tempo.</span><div class="cosmetic-bonus">Overdrive dura +3s</div><span class="item-cost">Custo: <span class="cost-shard">400 Fragmentos</span></span></div><div class="item-count">⏳</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_singularity" onclick="selectCosmetic('skin', 'singularity')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Colapso Gravitacional</span><span class="item-desc">Um buraco negro prestes a explodir.</span><div class="cosmetic-bonus">+25% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">1.5K Fragmentos</span></span></div><div class="item-count">🕳</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_divine" onclick="selectCosmetic('skin', 'divine')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Núcleo Divino</span><span class="item-desc">A própria manifestação do poder supremo.</span><div class="cosmetic-bonus">+20% Clique e +20% CPS</div><span class="item-cost">Custo: <span class="cost-shard">5K Fragmentos</span></span></div><div class="item-count">👑</div>
+                </div>
+
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;">
+
+                <div class="shop-item trail-type equipped" id="cosmetic-trail_none" onclick="selectCosmetic('trail', 'none')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Sem Trilha</span><span class="item-desc">Padrão.</span><div class="cosmetic-bonus">Sem bónus</div><span class="item-cost">Adquirido</span></div><div class="item-count">✖</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_cyber" onclick="selectCosmetic('trail', 'cyber')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro Ciano</span><span class="item-desc">Partículas elétricas azuis.</span><div class="cosmetic-bonus">+3% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">10 Fragmentos</span></span></div><div class="item-count">░</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_golden" onclick="selectCosmetic('trail', 'golden')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Centelhas de Ouro</span><span class="item-desc">Poeira cósmica dourada.</span><div class="cosmetic-bonus">+5% Poder de Clique Base</div><span class="item-cost">Custo: <span class="cost-shard">25 Fragmentos</span></span></div><div class="item-count">✨</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_toxic" onclick="selectCosmetic('trail', 'toxic')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Chama Ácida</span><span class="item-desc">Rastro radioativo instável.</span><div class="cosmetic-bonus">+5% Multiplicador Crítico</div><span class="item-cost">Custo: <span class="cost-shard">80 Fragmentos</span></span></div><div class="item-count">🧪</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_quantum" onclick="selectCosmetic('trail', 'quantum')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro Entropia</span><span class="item-desc">Partículas que piscam entre dimensões.</span><div class="cosmetic-bonus">+5% CPS Global</div><span class="item-cost">Custo: <span class="cost-shard">250 Fragmentos</span></span></div><div class="item-count">🔮</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_solar" onclick="selectCosmetic('trail', 'solar')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Ejeção Solar</span><span class="item-desc">Rastro de fogo estelar puro.</span><div class="cosmetic-bonus">+10% Crit no Overdrive</div><span class="item-cost">Custo: <span class="cost-shard">800 Fragmentos</span></span></div><div class="item-count">☀️</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_infinity" onclick="selectCosmetic('trail', 'infinity')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro do Infinito</span><span class="item-desc">Deixa poeira cósmica brilhante eterna.</span><div class="cosmetic-bonus">+15% Total Ganho por Cliques</div><span class="item-cost">Custo: <span class="cost-shard">3K Fragmentos</span></span></div><div class="item-count">♾️</div>
+                </div>
+            </div>
+
+            <div class="shop-content" id="tab-prestige">
+                <div class="prestige-header">
+                    <div class="prestige-title">Colapso Universal</div>
+                    <div class="prestige-desc">O universo atual chegou ao seu limite. Reinicie tudo em troca de um poder inimaginável. As moedas cosméticas são mantidas.</div>
+                    <button class="prestige-btn" id="btn-ascend" onclick="ascend()" disabled>Ascender (Requer 1 Milhão)</button>
+                </div>
+                <div class="chip-display">
+                    💠 Chips de Antimatéria: <span id="chips-count">0</span><br>
+                    <span style="font-size:0.8rem; color:#888;">(Bônus Atual: +<span id="chips-bonus">0</span>% em todos os ganhos)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            essencia: 0, shards: 0, combo: 1, lastClickTime: Date.now(), lastSaveTime: Date.now(),
+            baseClickPower: 1, baseCps: 0, odCharge: 0, odActive: false, odTimeLeft: 0,
+            
+            stats: { totalClicks: 0, totalCrits: 0 },
+            
+            achievements: {
+                firstClick: { done: false, title: "O Despertar", desc: "Deu seu primeiro clique no cristal." },
+                hundredClicks: { done: false, title: "Dedo Nervoso", desc: "Atingiu 100 cliques." },
+                firstMillion: { done: false, title: "Magnata de Energia", desc: "Acumulou 1 Milhão de Essência." },
+                firstOverdrive: { done: false, title: "SOBRECARGA!", desc: "Ativou o modo Overdrive pela primeira vez." },
+                firstAscension: { done: false, title: "Além do Infinito", desc: "Realizou a sua primeira Ascensão." }
+            },
+            
+            prestige: { chips: 0, multiplier: 1 },
+            buff: { active: false, multiplier: 1, timeLeft: 0, name: '' },
+            
+            upgrades: {
+                click1: { count: 0, baseCost: 10, cost: 10, step: 1, type: 'click' },
+                click2: { count: 0, baseCost: 250, cost: 250, step: 8, type: 'click' },
+                click3: { count: 0, baseCost: 2500, cost: 2500, step: 50, type: 'click' },
+                click4: { count: 0, baseCost: 15000, cost: 15000, step: 250, type: 'click' },
+                click5: { count: 0, baseCost: 100000, cost: 100000, step: 1200, type: 'click' },
+                click6: { count: 0, baseCost: 800000, cost: 800000, step: 8000, type: 'click' },
+                click7: { count: 0, baseCost: 5000000, cost: 5000000, step: 45000, type: 'click' },
+                click8: { count: 0, baseCost: 40000000, cost: 40000000, step: 300000, type: 'click' },
+                click9: { count: 0, baseCost: 350000000, cost: 350000000, step: 2500000, type: 'click' },
+                click10: { count: 0, baseCost: 3000000000, cost: 3000000000, step: 20000000, type: 'click' },
+                click11: { count: 0, baseCost: 25000000000, cost: 25000000000, step: 150000000, type: 'click' },
+                click12: { count: 0, baseCost: 250000000000, cost: 250000000000, step: 1200000000, type: 'click' },
+                
+                auto1:  { count: 0, baseCost: 50, cost: 50, step: 1.0, type: 'auto' },
+                auto2:  { count: 0, baseCost: 800, cost: 800, step: 15.0, type: 'auto' },
+                auto3:  { count: 0, baseCost: 12000, cost: 12000, step: 200.0, type: 'auto' },
+                auto4:  { count: 0, baseCost: 150000, cost: 150000, step: 1500.0, type: 'auto' },
+                auto5:  { count: 0, baseCost: 1200000, cost: 1200000, step: 10000.0, type: 'auto' },
+                auto6:  { count: 0, baseCost: 15000000, cost: 15000000, step: 100000.0, type: 'auto' },
+                auto7:  { count: 0, baseCost: 200000000, cost: 200000000, step: 1000000.0, type: 'auto' },
+                auto8:  { count: 0, baseCost: 2500000000, cost: 2500000000, step: 12000000.0, type: 'auto' },
+                auto9:  { count: 0, baseCost: 35000000000, cost: 35000000000, step: 150000000.0, type: 'auto' },
+                auto10: { count: 0, baseCost: 500000000000, cost: 500000000000, step: 2000000000.0, type: 'auto' },
+                auto11: { count: 0, baseCost: 8000000000000, cost: 8000000000000, step: 30000000000.0, type: 'auto' },
+                auto12: { count: 0, baseCost: 150000000000000, cost: 150000000000000, step: 500000000000.0, type: 'auto' },
+                auto13: { count: 0, baseCost: 3000000000000000, cost: 3000000000000000, step: 8000000000000.0, type: 'auto' }
+            },
+            cosmetics: {
+                skin: { current: 'default', owned: ['default'], data: {
+                    default: { cost: 0, gradient: 'linear-gradient(135deg, #00bdff 0%, #003366 40%, #7a00ff 100%)', shadow: '#00f0ff', clip: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' },
+                    ruby: { cost: 5, gradient: 'linear-gradient(135deg, #ff0055 0%, #4a0011 40%, #ff5500 100%)', shadow: '#ff0055', clip: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' },
+                    emerald: { cost: 15, gradient: 'linear-gradient(135deg, #39ff14 0%, #004d1a 50%, #00ffaa 100%)', shadow: '#39ff14', clip: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' },
+                    void: { cost: 40, gradient: 'linear-gradient(135deg, #110022 0%, #330066 50%, #000000 100%)', shadow: 'rgba(157, 0, 255, 0.6)', clip: 'polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%)' },
+                    nebula: { cost: 120, gradient: 'linear-gradient(135deg, #ff00ff 0%, #ff7700 50%, #660066 100%)', shadow: 'rgba(255, 0, 255, 0.7)', clip: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' },
+                    chronos: { cost: 400, gradient: 'linear-gradient(135deg, #00ffff 0%, #ffffff 50%, #008888 100%)', shadow: 'rgba(0, 255, 255, 0.8)', clip: 'polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%)' },
+                    singularity: { cost: 1500, gradient: 'linear-gradient(135deg, #050505 0%, #1a1a1a 40%, #ff3300 100%)', shadow: 'rgba(255, 51, 0, 0.9)', clip: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' },
+                    divine: { cost: 5000, gradient: 'linear-gradient(135deg, #ffffff 0%, #ffd700 50%, #ff9900 100%)', shadow: 'rgba(255, 215, 0, 1)', clip: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' }
+                }},
+                trail: { current: 'none', owned: ['none'], data: {
+                    none: { cost: 0, color: 'transparent' }, 
+                    cyber: { cost: 10, color: '#00f0ff' }, 
+                    golden: { cost: 25, color: '#ffd700' },
+                    toxic: { cost: 80, color: '#39ff14' },
+                    quantum: { cost: 250, color: '#9d00ff' },
+                    solar: { cost: 800, color: '#ff4500' },
+                    infinity: { cost: 3000, color: '#ffffff' }
+                }}
+            }
+        };
+
+        // --- SAVE E LOAD ---
+        function saveGame() {
+            gameState.lastSaveTime = Date.now();
+            localStorage.setItem('crystalOverdriveSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            let savedData = localStorage.getItem('crystalOverdriveSave');
+            if (savedData) {
+                let parsed = JSON.parse(savedData);
+                gameState = mergeDeep(gameState, parsed);
+                
+                let now = Date.now();
+                let diffSeconds = (now - gameState.lastSaveTime) / 1000;
+                
+                if (diffSeconds > 60 && getTrueCPS() > 0) {
+                    let offlineEssence = diffSeconds * getTrueCPS();
+                    gameState.essencia += offlineEssence;
+                    
+                    setTimeout(() => {
+                        showToast("Bem-vindo de volta!", `Seus sistemas geraram ${formatNum(offlineEssence)} Essências off-line!`, "⚡");
+                        playBeep('overdrive');
+                    }, 1000);
+                }
+            }
+            applyVisuals();
+            resizeCanvas();
+            updateUI();
+        }
+
+        function mergeDeep(target, source) {
+            for (const key in source) {
+                if (source[key] instanceof Object && key in target) {
+                    Object.assign(source[key], mergeDeep(target[key], source[key]));
+                }
+            }
+            Object.assign(target || {}, source);
+            return target;
+        }
+
+        function hardReset() {
+            if(confirm("ATENÇÃO: Isso apagará seu progresso permanentemente. Tem certeza?")) {
+                localStorage.removeItem('crystalOverdriveSave');
+                location.reload();
+            }
+        }
+
+        setInterval(saveGame, 10000);
+        window.onload = loadGame;
+
+        // --- TOASTS / CONQUISTAS ---
+        function showToast(title, desc, icon = "🏆") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">
+                    <h4>${title}</h4>
+                    <p>${desc}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            
+            if(soundEnabled && audioCtx) {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                osc.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            }
+            setTimeout(() => { toast.remove(); }, 5000);
+        }
+
+        function checkAchievements() {
+            if (!gameState.achievements.firstClick.done && gameState.stats.totalClicks >= 1) {
+                gameState.achievements.firstClick.done = true;
+                showToast(gameState.achievements.firstClick.title, gameState.achievements.firstClick.desc);
+            }
+            if (!gameState.achievements.hundredClicks.done && gameState.stats.totalClicks >= 100) {
+                gameState.achievements.hundredClicks.done = true;
+                showToast(gameState.achievements.hundredClicks.title, gameState.achievements.hundredClicks.desc);
+            }
+            if (!gameState.achievements.firstMillion.done && gameState.essencia >= 1000000) {
+                gameState.achievements.firstMillion.done = true;
+                showToast(gameState.achievements.firstMillion.title, gameState.achievements.firstMillion.desc, "💰");
+            }
+        }
+
+        // --- ÁUDIO SINTÉTICO ---
+        let soundEnabled = false;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('btn-sound').innerText = soundEnabled ? '🔊 Som' : '🔇 Som';
+            if(soundEnabled && !audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playBeep(type) {
+            if (!soundEnabled || !audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'crit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'overdrive') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 1.5);
+            }
+        }
+
+        // --- CÁLCULOS DO CORE ---
+        function getTrueClick() {
+            let synergyBonus = 0;
+            let cps = getTrueCPS();
+            
+            if (gameState.upgrades.click1.count >= 25) synergyBonus += cps * 0.02;
+            if (gameState.upgrades.click2.count >= 25) synergyBonus += cps * 0.05;
+            if (gameState.upgrades.click3.count >= 25) synergyBonus += cps * 0.08;
+            if (gameState.upgrades.click4.count >= 25) synergyBonus += cps * 0.12;
+            if (gameState.upgrades.click5.count >= 25) synergyBonus += cps * 0.18;
+            if (gameState.upgrades.click6.count >= 25) synergyBonus += cps * 0.25;
+            if (gameState.upgrades.click7.count >= 25) synergyBonus += cps * 0.35;
+            if (gameState.upgrades.click8.count >= 25) synergyBonus += cps * 0.50;
+            if (gameState.upgrades.click9.count >= 25) synergyBonus += cps * 0.70;
+            if (gameState.upgrades.click10.count >= 25) synergyBonus += cps * 1.00;
+            if (gameState.upgrades.click11.count >= 25) synergyBonus += cps * 1.50;
+            if (gameState.upgrades.click12.count >= 25) synergyBonus += cps * 2.50;
+            
+            let base = (gameState.baseClickPower + synergyBonus);
+            
+            if (gameState.cosmetics.skin.current === 'emerald') base += gameState.baseClickPower * 0.10;
+            if (gameState.cosmetics.skin.current === 'divine') base += gameState.baseClickPower * 0.20;
+            if (gameState.cosmetics.trail.current === 'golden') base += gameState.baseClickPower * 0.05;
+            
+            let total = base * gameState.prestige.multiplier;
+            
+            if (gameState.cosmetics.trail.current === 'infinity') total *= 1.15;
+            if (gameState.buff.active) total *= gameState.buff.multiplier;
+            
+            return total;
+        }
+
+        function getTrueCPS() {
+            let totalCPS = 0;
+            for (let key in gameState.upgrades) {
+                if (gameState.upgrades[key].type === 'auto') {
+                    totalCPS += gameState.upgrades[key].count * gameState.upgrades[key].step;
+                }
+            }
+            
+            let multiplier = gameState.prestige.multiplier;
+            
+            if (gameState.cosmetics.skin.current === 'nebula') multiplier += 0.08;
+            if (gameState.cosmetics.skin.current === 'divine') multiplier += 0.20;
+            if (gameState.cosmetics.trail.current === 'quantum') multiplier += 0.05;
+            
+            let finalCPS = totalCPS * multiplier;
+            if (gameState.buff.active) finalCPS *= gameState.buff.multiplier;
+            return finalCPS;
+        }
+
+        function formatNum(num) {
+            if(num < 1000) return Math.floor(num).toString();
+            let suffixes = ["", " Mil", " Milhões", " Bilhões", " Trilhões", " Quadrilhões", " Quintilhões"];
+            let suffixIndex = Math.floor(Math.log10(num) / 3);
+            if(suffixIndex >= suffixes.length) suffixIndex = suffixes.length - 1;
+            let shortVal = (num / Math.pow(1000, suffixIndex)).toFixed(2);
+            return shortVal + suffixes[suffixIndex];
+        }
+
+        // --- CLIQUE NO CRISTAL ---
+        const cristal = document.getElementById('cristal');
+        const crystalZone = document.getElementById('crystal-zone');
+
+        cristal.addEventListener('click', (e) => {
+            const agora = Date.now();
+            gameState.stats.totalClicks++;
+            
+            if (agora - gameState.lastClickTime < 400) { gameState.combo = Math.min(gameState.combo + 1, 50); } 
+            else { gameState.combo = 1; }
+            gameState.lastClickTime = agora;
+
+            let totalCritChance = 0.05;
+            if (gameState.cosmetics.skin.current === 'ruby') totalCritChance += 0.05;
+            if (gameState.cosmetics.skin.current === 'singularity') totalCritChance += 0.25;
+            if (gameState.cosmetics.trail.current === 'cyber') totalCritChance += 0.03;
+            if (gameState.cosmetics.trail.current === 'solar' && gameState.odActive) totalCritChance += 0.10;
+
+            let isCrit = Math.random() < totalCritChance;
+            if (isCrit) gameState.stats.totalCrits++;
+
+            let baseDmg = getTrueClick();
+            let modOD = gameState.odActive ? 2 : 1;
+            let bonusCombo = Math.floor(gameState.combo / 5) * gameState.prestige.multiplier;
+            
+            let ganhoTotal = (baseDmg + bonusCombo) * modOD;
+            
+            if (isCrit) {
+                let totalCritMultiplier = 5;
+                if (gameState.cosmetics.skin.current === 'void') totalCritMultiplier += 0.15;
+                if (gameState.cosmetics.trail.current === 'toxic') totalCritMultiplier += 0.05;
+                
+                ganhoTotal *= totalCritMultiplier;
+                playBeep('crit'); 
+                triggerShake('shake-active'); 
+            } else { 
+                playBeep('click'); 
+            }
+
+            if (gameState.odActive && Math.random() < 0.15) {
+                gameState.shards += 1;
+                createFloatingNumber(e.clientX, e.clientY - 30, `+1 🌌`, 'var(--neon-gold)', false);
+            }
+
+            if (!gameState.odActive) {
+                gameState.odCharge = Math.min(gameState.odCharge + 2.5, 100);
+                if (gameState.odCharge >= 100) activateOverdrive();
+            }
+
+            let color = isCrit ? 'var(--neon-gold)' : (gameState.odActive ? 'var(--neon-pink)' : 'var(--neon-blue)');
+            let desvioX = (Math.random() - 0.5) * 40;
+            createFloatingNumber(e.clientX + desvioX, e.clientY, `+${formatNum(ganhoTotal)}`, color, isCrit);
+            
+            checkAchievements();
+            updateUI();
+        });
+
+        function triggerShake(typeClass) {
+            document.body.classList.remove('shake-active', 'shake-hard');
+            void document.body.offsetWidth; 
+            document.body.classList.add(typeClass);
+            setTimeout(() => document.body.classList.remove(typeClass), 600);
+        }
+
+        function createFloatingNumber(x, y, text, color, isCrit) {
+            const num = document.createElement('div');
+            num.className = 'floating-number' + (isCrit ? ' crit' : '');
+            num.innerText = isCrit ? `CRIT! ${text}` : text;
+            num.style.color = color;
+            num.style.textShadow = `0 0 15px ${color}`;
+
+            const rect = crystalZone.getBoundingClientRect();
+            num.style.left = `${x - rect.left - 20}px`;
+            num.style.top = `${y - rect.top - 20}px`;
+
+            crystalZone.appendChild(num);
+            setTimeout(() => num.remove(), isCrit ? 1000 : 600);
+        }
+
+        // --- GESTÃO DE MODOS E EVENTOS ---
+        function activateOverdrive() {
+            gameState.odActive = true;
+            let duration = 15;
+            if (gameState.cosmetics.skin.current === 'chronos') duration += 3;
+            
+            gameState.odTimeLeft = duration;
+            document.body.classList.add('overdrive-active');
+            document.getElementById('od-text').innerText = `OVERDRIVE: ${gameState.odTimeLeft}s`;
+            
+            if (!gameState.achievements.firstOverdrive.done) {
+                gameState.achievements.firstOverdrive.done = true;
+                showToast(gameState.achievements.firstOverdrive.title, gameState.achievements.firstOverdrive.desc, "🔥");
+            }
+
+            playBeep('overdrive');
+            triggerShake('shake-hard');
+            gameState.shards += 2; 
+
+            let odInterval = setInterval(() => {
+                gameState.odTimeLeft--;
+                gameState.odCharge = (gameState.odTimeLeft / duration) * 100;
+                document.getElementById('od-text').innerText = `OVERDRIVE: ${gameState.odTimeLeft}s`;
+                
+                if (gameState.odTimeLeft <= 0) {
+                    clearInterval(odInterval);
+                    gameState.odActive = false;
+                    gameState.odCharge = 0;
+                    document.body.classList.remove('overdrive-active');
+                    document.getElementById('od-text').innerText = `Carregando Overdrive`;
+                    applyVisuals();
+                }
+                updateUI();
+            }, 1000);
+        }
+
+        setInterval(() => {
+            if(Math.random() < 0.3 && !gameState.buff.active && document.getElementById('anomaly').style.display !== 'block') spawnAnomaly();
+        }, 15000);
+
+        function spawnAnomaly() {
+            const an = document.getElementById('anomaly');
+            const rect = crystalZone.getBoundingClientRect();
+            let maxW = rect.width - 80; let maxH = rect.height - 180;
+            an.style.left = `${Math.random() * maxW + 20}px`;
+            an.style.top = `${Math.random() * maxH + 80}px`;
+            an.style.display = 'block';
+            setTimeout(() => { an.style.display = 'none'; }, 7000);
+        }
+
+        function clickAnomaly(e) {
+            e.stopPropagation();
+            document.getElementById('anomaly').style.display = 'none';
+            playBeep('overdrive'); triggerShake('shake-active');
+
+            const buffs = [
+                { name: 'Frenesi Cósmico (CPS x7)', mult: 7 },
+                { name: 'Sobrecarga de Clique (Tudo x3)', mult: 3 },
+                { name: 'Chuva Estelar (CPS x15)', mult: 15 }
+            ];
+            let roll = buffs[Math.floor(Math.random() * buffs.length)];
+            
+            gameState.buff.active = true;
+            gameState.buff.multiplier = roll.mult;
+            gameState.buff.name = roll.name;
+            gameState.buff.timeLeft = 20;
+
+            let buffInterval = setInterval(() => {
+                gameState.buff.timeLeft--;
+                document.getElementById('active-buff').innerText = `⚡ ${gameState.buff.name} : ${gameState.buff.timeLeft}s ⚡`;
+                
+                if(gameState.buff.timeLeft <= 0) {
+                    clearInterval(buffInterval);
+                    gameState.buff.active = false;
+                    gameState.buff.multiplier = 1;
+                    document.getElementById('active-buff').innerText = '';
+                }
+                updateUI();
+            }, 1000);
+            updateUI();
+        }
+
+        // --- PRESTÍGIO ---
+        function ascend() {
+            if(gameState.essencia < 1000000) return;
+            let newChips = Math.floor(Math.sqrt(gameState.essencia / 100000));
+            if(newChips < 1) newChips = 1;
+            
+            if(confirm(`O Universo entrará em colapso! Você perderá pontos e upgrades, mas ganhará +${newChips} Chips. Ascender?`)) {
+                if (!gameState.achievements.firstAscension.done) {
+                    gameState.achievements.firstAscension.done = true;
+                    showToast(gameState.achievements.firstAscension.title, gameState.achievements.firstAscension.desc, "🌌");
+                }
+
+                gameState.prestige.chips += newChips;
+                gameState.prestige.multiplier = 1 + (gameState.prestige.chips * 0.10);
+                gameState.essencia = 0; gameState.combo = 1;
+                gameState.baseClickPower = 1;
+                
+                for(let key in gameState.upgrades) {
+                    gameState.upgrades[key].count = 0;
+                    gameState.upgrades[key].cost = gameState.upgrades[key].baseCost;
+                }
+
+                document.body.classList.remove('overdrive-active');
+                triggerShake('shake-hard'); playBeep('overdrive');
+                saveGame();
+                switchTab('upgrades'); 
+                updateUI();
+            }
+        }
+
+        // --- INTERFACE LOJA ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.shop-content').forEach(content => content.classList.remove('active'));
+            
+            if(tabName === 'upgrades') document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            if(tabName === 'cosmetics') document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            if(tabName === 'prestige') document.querySelector('.tab-btn.ascension').classList.add('active');
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function buyUpgrade(type) {
+            let up = gameState.upgrades[type];
+            if (gameState.essencia >= up.cost) {
+                gameState.essencia -= up.cost;
+                up.count++;
+                up.cost = Math.floor(up.baseCost * Math.pow(1.15, up.count));
+                if (up.type === 'click') gameState.baseClickPower += up.step;
+                playBeep('click');
+                updateUI();
+            }
+        }
+
+        function selectCosmetic(category, id) {
+            let cat = gameState.cosmetics[category];
+            let item = cat.data[id];
+            if (cat.owned.includes(id)) { cat.current = id; applyVisuals(); updateUI(); return; }
+            if (gameState.shards >= item.cost) {
+                gameState.shards -= item.cost;
+                cat.owned.push(id); cat.current = id;
+                applyVisuals(); updateUI();
+                saveGame();
+            }
+        }
+
+        function applyVisuals() {
+            if (gameState.odActive) return; 
+            let currentSkin = gameState.cosmetics.skin.data[gameState.cosmetics.skin.current];
+            document.documentElement.style.setProperty('--crystal-gradient', currentSkin.gradient);
+            document.documentElement.style.setProperty('--crystal-shadow', currentSkin.shadow);
+            document.documentElement.style.setProperty('--crystal-clip', currentSkin.clip);
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = formatNum(gameState.essencia);
+            document.getElementById('cps').innerText = formatNum(getTrueCPS());
+            document.getElementById('shards').innerText = gameState.shards;
+            document.getElementById('combo-display').innerText = gameState.combo > 4 ? `STREAK X${gameState.combo}` : '';
+            document.getElementById('od-bar').style.width = `${gameState.odCharge}%`;
+            
+            document.getElementById('stat-clicks').innerText = formatNum(gameState.stats.totalClicks);
+            document.getElementById('stat-crits').innerText = formatNum(gameState.stats.totalCrits);
+
+            if(gameState.buff.active && !gameState.odActive) {
+                document.getElementById('active-buff').innerText = `⚡ ${gameState.buff.name} : ${gameState.buff.timeLeft}s ⚡`;
+            } else if (!gameState.buff.active) {
+                document.getElementById('active-buff').innerText = '';
+            }
+
+            for (let key in gameState.upgrades) {
+                let up = gameState.upgrades[key];
+                let itemEl = document.getElementById(`upgrade-${key}`);
+                if (itemEl) {
+                    document.getElementById(`cost-${key}`).innerText = formatNum(up.cost);
+                    document.getElementById(`count-${key}`).innerText = up.count;
+
+                    if (gameState.essencia >= up.cost) itemEl.classList.remove('disabled');
+                    else itemEl.classList.add('disabled');
+
+                    let badge = document.getElementById(`badge-${key}`);
+                    if(badge) {
+                        if(up.count >= 25) badge.style.display = 'block';
+                        else badge.style.display = 'none';
+                    }
+                }
+            }
+
+            for (let id in gameState.cosmetics.skin.data) updateCosmItem('skin', id);
+            for (let id in gameState.cosmetics.trail.data) updateCosmItem('trail', id);
+            
+            document.querySelectorAll('.shop-item.skin-type, .shop-item.trail-type').forEach(el => el.classList.remove('equipped'));
+            document.getElementById(`cosmetic-skin_${gameState.cosmetics.skin.current}`).classList.add('equipped');
+            document.getElementById(`cosmetic-trail_${gameState.cosmetics.trail.current}`).classList.add('equipped');
+
+            let btnAscend = document.getElementById('btn-ascend');
+            if(gameState.essencia >= 1000000) {
+                btnAscend.disabled = false;
+                let preview = Math.floor(Math.sqrt(gameState.essencia / 100000));
+                btnAscend.innerText = `Ascender (+${preview < 1 ? 1 : preview} Chips)`;
+            } else {
+                btnAscend.disabled = true;
+                btnAscend.innerText = "Ascender (Requer 1 Milhão)";
+            }
+            document.getElementById('chips-count').innerText = gameState.prestige.chips;
+            document.getElementById('chips-bonus').innerText = (gameState.prestige.multiplier - 1) * 100;
+        }
+
+        function updateCosmItem(category, id) {
+            let cat = gameState.cosmetics[category];
+            let el = document.getElementById(`cosmetic-${category}_${id}`);
+            if (el) {
+                if (cat.owned.includes(id)) {
+                    el.classList.remove('disabled'); el.querySelector('.item-cost').innerText = "Adquirido";
+                } else {
+                    if (gameState.shards >= cat.data[id].cost) el.classList.remove('disabled');
+                    else el.classList.add('disabled');
+                }
+            }
+        }
+
+        // --- SISTEMA DE PARTÍCULAS RESPONSIVO ---
+        const canvas = document.getElementById('trail-canvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { 
+            canvas.width = crystalZone.clientWidth; 
+            canvas.height = crystalZone.clientHeight; 
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let particles = [];
+        crystalZone.addEventListener('mousemove', (e) => {
+            if (gameState.cosmetics.trail.current === 'none') return;
+            const rect = crystalZone.getBoundingClientRect();
+            for (let i = 0; i < 2; i++) {
+                particles.push({
+                    x: e.clientX - rect.left, y: e.clientY - rect.top,
+                    size: Math.random() * 4 + 2, speedX: (Math.random() - 0.5) * 2, speedY: (Math.random() - 0.5) * 2 - 1,
+                    alpha: 1, color: gameState.cosmetics.trail.data[gameState.cosmetics.trail.current].color
+                });
+            }
+        });
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.speedX; p.y += p.speedY; p.alpha -= 0.02;
+                if (p.alpha <= 0) { particles.splice(i, 1); i--; continue; }
+                
+                ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color; ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+                let cTrail = gameState.cosmetics.trail.current;
+                if(cTrail === 'golden' || cTrail === 'solar' || cTrail === 'infinity') {
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size/1.5, 0, Math.PI * 2); ctx.fill();
+                } else { ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); }
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- PASSIVO TICK ---
+        setInterval(() => {
+            let currentCps = getTrueCPS();
+            if (currentCps > 0) {
+                gameState.essencia += (currentCps / 10);
+                checkAchievements();
+                updateUI();
+            }
+        }, 100);
+    </script>
+</body>
+</html>
