@@ -303,6 +303,7 @@
         .item-desc { font-size: 0.8rem; color: #888895; margin-top: 2px; }
         .item-cost { font-size: 0.95rem; color: #fff; font-weight: bold; margin-top: 5px; font-family: monospace; }
         .cost-shard { color: var(--neon-gold); }
+        .cosmetic-bonus { font-size: 0.75rem; color: var(--neon-green); font-weight: bold; margin-top: 3px; }
         
         .milestone-badge { position: absolute; top: -10px; right: -5px; background: var(--neon-purple); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; box-shadow: 0 0 5px var(--neon-purple); display: none; }
         .item-count { font-size: 1.4rem; font-weight: 800; color: rgba(255,255,255,0.15); font-family: monospace; }
@@ -329,7 +330,6 @@
                 <button class="control-btn btn-danger" onclick="hardReset()">Limpar Save</button>
             </div>
 
-            <!-- Estatísticas do Jogador -->
             <div class="stats-panel">
                 Cliques Manuais: <span id="stat-clicks">0</span><br>
                 Críticos Feitos: <span id="stat-crits">0</span>
@@ -365,85 +365,150 @@
                 <button class="tab-btn ascension" onclick="switchTab('prestige')">Ascensão</button>
             </div>
             
-            <!-- LOJA -->
             <div class="shop-content active" id="tab-upgrades">
                 <div class="shop-item disabled click-type" id="upgrade-click1" onclick="buyUpgrade('click1')">
                     <div class="milestone-badge" id="badge-click1">Sinergia Ativa!</div>
-                    <div class="item-info">
-                        <span class="item-tag">Manual</span>
-                        <span class="item-name">Laser de Impacto</span>
-                        <span class="item-desc">+1 Base / Sinergia a cada 25</span>
-                        <span class="item-cost">Custo: <span id="cost-click1">10</span></span>
-                    </div>
-                    <div class="item-count" id="count-click1">0</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Laser de Impacto</span><span class="item-desc">+1 Base / Sinergia (2%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click1">10</span></span></div><div class="item-count" id="count-click1">0</div>
                 </div>
-
-                <div class="shop-item disabled auto-type" id="upgrade-auto1" onclick="buyUpgrade('auto1')">
-                    <div class="item-info">
-                        <span class="item-tag">Automático</span>
-                        <span class="item-name">Extrator Estático</span>
-                        <span class="item-desc">+1.0 ponto/segundo</span>
-                        <span class="item-cost">Custo: <span id="cost-auto1">50</span></span>
-                    </div>
-                    <div class="item-count" id="count-auto1">0</div>
-                </div>
-
                 <div class="shop-item disabled click-type" id="upgrade-click2" onclick="buyUpgrade('click2')">
                     <div class="milestone-badge" id="badge-click2">Sinergia Ativa!</div>
-                    <div class="item-info">
-                        <span class="item-tag">Manual</span>
-                        <span class="item-name">Manopla Cinética</span>
-                        <span class="item-desc">+8 Base / Sinergia a cada 25</span>
-                        <span class="item-cost">Custo: <span id="cost-click2">250</span></span>
-                    </div>
-                    <div class="item-count" id="count-click2">0</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Manopla Cinética</span><span class="item-desc">+8 Base / Sinergia (5%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click2">250</span></span></div><div class="item-count" id="count-click2">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click3" onclick="buyUpgrade('click3')">
+                    <div class="milestone-badge" id="badge-click3">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Amplificador Quântico</span><span class="item-desc">+50 Base / Sinergia (8%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click3">2500</span></span></div><div class="item-count" id="count-click3">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click4" onclick="buyUpgrade('click4')">
+                    <div class="milestone-badge" id="badge-click4">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Canhão de Grávitons</span><span class="item-desc">+250 Base / Sinergia (12%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click4">15000</span></span></div><div class="item-count" id="count-click4">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click5" onclick="buyUpgrade('click5')">
+                    <div class="milestone-badge" id="badge-click5">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Foco Prismático</span><span class="item-desc">+1.2K Base / Sinergia (18%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click5">100000</span></span></div><div class="item-count" id="count-click5">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click6" onclick="buyUpgrade('click6')">
+                    <div class="milestone-badge" id="badge-click6">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Lente de Singularidade</span><span class="item-desc">+8K Base / Sinergia (25%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click6">800000</span></span></div><div class="item-count" id="count-click6">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click7" onclick="buyUpgrade('click7')">
+                    <div class="milestone-badge" id="badge-click7">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Ressonador de Táquions</span><span class="item-desc">+45K Base / Sinergia (35%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click7">5000000</span></span></div><div class="item-count" id="count-click7">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click8" onclick="buyUpgrade('click8')">
+                    <div class="milestone-badge" id="badge-click8">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Disruptor Dimensional</span><span class="item-desc">+300K Base / Sinergia (50%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click8">40000000</span></span></div><div class="item-count" id="count-click8">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click9" onclick="buyUpgrade('click9')">
+                    <div class="milestone-badge" id="badge-click9">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Matriz de Antimatéria</span><span class="item-desc">+2.5M Base / Sinergia (70%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click9">350000000</span></span></div><div class="item-count" id="count-click9">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click10" onclick="buyUpgrade('click10')">
+                    <div class="milestone-badge" id="badge-click10">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Lâmina do Vazio</span><span class="item-desc">+20M Base / Sinergia (100%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click10">3000000000</span></span></div><div class="item-count" id="count-click10">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click11" onclick="buyUpgrade('click11')">
+                    <div class="milestone-badge" id="badge-click11">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Colisor de Realidades</span><span class="item-desc">+150M Base / Sinergia (150%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click11">25000000000</span></span></div><div class="item-count" id="count-click11">0</div>
+                </div>
+                <div class="shop-item disabled click-type" id="upgrade-click12" onclick="buyUpgrade('click12')">
+                    <div class="milestone-badge" id="badge-click12">Sinergia Ativa!</div>
+                    <div class="item-info"><span class="item-tag">Manual</span><span class="item-name">Dedo de Deus</span><span class="item-desc">+1.2B Base / Sinergia (250%) a cada 25</span><span class="item-cost">Custo: <span id="cost-click12">250000000000</span></span></div><div class="item-count" id="count-click12">0</div>
                 </div>
 
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+                <div class="shop-item disabled auto-type" id="upgrade-auto1" onclick="buyUpgrade('auto1')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Extrator Estático</span><span class="item-desc">+1.0 ponto/segundo</span><span class="item-cost">Custo: <span id="cost-auto1">50</span></span></div><div class="item-count" id="count-auto1">0</div>
+                </div>
                 <div class="shop-item disabled auto-type" id="upgrade-auto2" onclick="buyUpgrade('auto2')">
-                    <div class="item-info">
-                        <span class="item-tag">Automático</span>
-                        <span class="item-name">Reator de Plasma</span>
-                        <span class="item-desc">+15.0 pontos/segundo</span>
-                        <span class="item-cost">Custo: <span id="cost-auto2">800</span></span>
-                    </div>
-                    <div class="item-count" id="count-auto2">0</div>
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Reator de Plasma</span><span class="item-desc">+15.0 pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto2">800</span></span></div><div class="item-count" id="count-auto2">0</div>
                 </div>
-
                 <div class="shop-item disabled auto-type" id="upgrade-auto3" onclick="buyUpgrade('auto3')">
-                    <div class="item-info">
-                        <span class="item-tag">Automático</span>
-                        <span class="item-name">Nuvem Cronométrica</span>
-                        <span class="item-desc">+200.0 pontos/segundo</span>
-                        <span class="item-cost">Custo: <span id="cost-auto3">12000</span></span>
-                    </div>
-                    <div class="item-count" id="count-auto3">0</div>
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Nuvem Cronométrica</span><span class="item-desc">+200.0 pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto3">12000</span></span></div><div class="item-count" id="count-auto3">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto4" onclick="buyUpgrade('auto4')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Sifão de Matéria Escura</span><span class="item-desc">+1.5K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto4">150000</span></span></div><div class="item-count" id="count-auto4">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto5" onclick="buyUpgrade('auto5')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Forja Estelar</span><span class="item-desc">+10K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto5">1200000</span></span></div><div class="item-count" id="count-auto5">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto6" onclick="buyUpgrade('auto6')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Esfera de Dyson</span><span class="item-desc">+100K pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto6">15000000</span></span></div><div class="item-count" id="count-auto6">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto7" onclick="buyUpgrade('auto7')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Motor de Curvatura</span><span class="item-desc">+1M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto7">200000000</span></span></div><div class="item-count" id="count-auto7">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto8" onclick="buyUpgrade('auto8')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Fenda Subespacial</span><span class="item-desc">+12M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto8">2500000000</span></span></div><div class="item-count" id="count-auto8">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto9" onclick="buyUpgrade('auto9')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Buraco Negro Artificial</span><span class="item-desc">+150M pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto9">35000000000</span></span></div><div class="item-count" id="count-auto9">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto10" onclick="buyUpgrade('auto10')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Nexus de Multiversos</span><span class="item-desc">+2B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto10">500000000000</span></span></div><div class="item-count" id="count-auto10">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto11" onclick="buyUpgrade('auto11')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Tecelão do Tempo</span><span class="item-desc">+30B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto11">8000000000000</span></span></div><div class="item-count" id="count-auto11">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto12" onclick="buyUpgrade('auto12')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Colhedor de Galáxias</span><span class="item-desc">+500B pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto12">150000000000000</span></span></div><div class="item-count" id="count-auto12">0</div>
+                </div>
+                <div class="shop-item disabled auto-type" id="upgrade-auto13" onclick="buyUpgrade('auto13')">
+                    <div class="item-info"><span class="item-tag">Automático</span><span class="item-name">Entropia Final</span><span class="item-desc">+8T pontos/segundo</span><span class="item-cost">Custo: <span id="cost-auto13">3000000000000000</span></span></div><div class="item-count" id="count-auto13">0</div>
                 </div>
             </div>
 
-            <!-- ESTILO -->
             <div class="shop-content" id="tab-cosmetics">
                 <div class="shop-item skin-type equipped" id="cosmetic-skin_default" onclick="selectCosmetic('skin', 'default')">
-                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Cristal Padrão</span><span class="item-desc">A energia azul clássica.</span><span class="item-cost">Adquirido</span></div><div class="item-count">★</div>
-                </div>
-                <div class="shop-item disabled skin-type" id="cosmetic-skin_emerald" onclick="selectCosmetic('skin', 'emerald')">
-                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Núcleo Esmeralda</span><span class="item-desc">Formato lapidado letal.</span><span class="item-cost">Custo: <span class="cost-shard">15 Fragmentos</span></span></div><div class="item-count">◇</div>
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Cristal Padrão</span><span class="item-desc">A energia azul clássica.</span><div class="cosmetic-bonus">Sem bónus</div><span class="item-cost">Adquirido</span></div><div class="item-count">★</div>
                 </div>
                 <div class="shop-item disabled skin-type" id="cosmetic-skin_ruby" onclick="selectCosmetic('skin', 'ruby')">
-                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Estrela de Rubi</span><span class="item-desc">Formato estelar superaquecido.</span><span class="item-cost">Custo: <span class="cost-shard">40 Fragmentos</span></span></div><div class="item-count">✦</div>
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Rubi de Sangue</span><span class="item-desc">Forjado no calor de estrelas moribundas.</span><div class="cosmetic-bonus">+5% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">5 Fragmentos</span></span></div><div class="item-count">✦</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_emerald" onclick="selectCosmetic('skin', 'emerald')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Esmeralda Vital</span><span class="item-desc">Irradia pura energia de crescimento.</span><div class="cosmetic-bonus">+10% Poder de Clique Base</div><span class="item-cost">Custo: <span class="cost-shard">15 Fragmentos</span></span></div><div class="item-count">◇</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_void" onclick="selectCosmetic('skin', 'void')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Fragmento do Vazio</span><span class="item-desc">Consome a luz ao seu redor.</span><div class="cosmetic-bonus">+15% Multiplicador Crítico</div><span class="item-cost">Custo: <span class="cost-shard">40 Fragmentos</span></span></div><div class="item-count">👁</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_nebula" onclick="selectCosmetic('skin', 'nebula')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Nébula Estelar</span><span class="item-desc">Uma galáxia inteira condensada.</span><div class="cosmetic-bonus">+8% CPS Global</div><span class="item-cost">Custo: <span class="cost-shard">120 Fragmentos</span></span></div><div class="item-count">🪐</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_chronos" onclick="selectCosmetic('skin', 'chronos')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Cristal Temporal</span><span class="item-desc">Distorce o fluxo do tempo.</span><div class="cosmetic-bonus">Overdrive dura +3s</div><span class="item-cost">Custo: <span class="cost-shard">400 Fragmentos</span></span></div><div class="item-count">⏳</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_singularity" onclick="selectCosmetic('skin', 'singularity')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Colapso Gravitacional</span><span class="item-desc">Um buraco negro prestes a explodir.</span><div class="cosmetic-bonus">+25% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">1.5K Fragmentos</span></span></div><div class="item-count">🕳</div>
+                </div>
+                <div class="shop-item disabled skin-type" id="cosmetic-skin_divine" onclick="selectCosmetic('skin', 'divine')">
+                    <div class="item-info"><span class="item-tag">Visual</span><span class="item-name">Núcleo Divino</span><span class="item-desc">A própria manifestação do poder supremo.</span><div class="cosmetic-bonus">+20% Clique e +20% CPS</div><span class="item-cost">Custo: <span class="cost-shard">5K Fragmentos</span></span></div><div class="item-count">👑</div>
                 </div>
 
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
                 <div class="shop-item trail-type equipped" id="cosmetic-trail_none" onclick="selectCosmetic('trail', 'none')">
-                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Sem Trilha</span><span class="item-desc">Padrão.</span><span class="item-cost">Adquirido</span></div><div class="item-count">✖</div>
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Sem Trilha</span><span class="item-desc">Padrão.</span><div class="cosmetic-bonus">Sem bónus</div><span class="item-cost">Adquirido</span></div><div class="item-count">✖</div>
                 </div>
                 <div class="shop-item disabled trail-type" id="cosmetic-trail_cyber" onclick="selectCosmetic('trail', 'cyber')">
-                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro Ciano</span><span class="item-desc">Partículas elétricas.</span><span class="item-cost">Custo: <span class="cost-shard">10 Fragmentos</span></span></div><div class="item-count">░</div>
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro Ciano</span><span class="item-desc">Partículas elétricas azuis.</span><div class="cosmetic-bonus">+3% Chance Crítica</div><span class="item-cost">Custo: <span class="cost-shard">10 Fragmentos</span></span></div><div class="item-count">░</div>
                 </div>
                 <div class="shop-item disabled trail-type" id="cosmetic-trail_golden" onclick="selectCosmetic('trail', 'golden')">
-                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Centelhas de Ouro</span><span class="item-desc">Poeira cósmica.</span><span class="item-cost">Custo: <span class="cost-shard">25 Fragmentos</span></span></div><div class="item-count">✨</div>
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Centelhas de Ouro</span><span class="item-desc">Poeira cósmica dourada.</span><div class="cosmetic-bonus">+5% Poder de Clique Base</div><span class="item-cost">Custo: <span class="cost-shard">25 Fragmentos</span></span></div><div class="item-count">✨</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_toxic" onclick="selectCosmetic('trail', 'toxic')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Chama Ácida</span><span class="item-desc">Rastro radioativo instável.</span><div class="cosmetic-bonus">+5% Multiplicador Crítico</div><span class="item-cost">Custo: <span class="cost-shard">80 Fragmentos</span></span></div><div class="item-count">🧪</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_quantum" onclick="selectCosmetic('trail', 'quantum')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro Entropia</span><span class="item-desc">Partículas que piscam entre dimensões.</span><div class="cosmetic-bonus">+5% CPS Global</div><span class="item-cost">Custo: <span class="cost-shard">250 Fragmentos</span></span></div><div class="item-count">🔮</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_solar" onclick="selectCosmetic('trail', 'solar')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Ejeção Solar</span><span class="item-desc">Rastro de fogo estelar puro.</span><div class="cosmetic-bonus">+10% Crit no Overdrive</div><span class="item-cost">Custo: <span class="cost-shard">800 Fragmentos</span></span></div><div class="item-count">☀️</div>
+                </div>
+                <div class="shop-item disabled trail-type" id="cosmetic-trail_infinity" onclick="selectCosmetic('trail', 'infinity')">
+                    <div class="item-info"><span class="item-tag">Trilha</span><span class="item-name">Rastro do Infinito</span><span class="item-desc">Deixa poeira cósmica brilhante eterna.</span><div class="cosmetic-bonus">+15% Total Ganho por Cliques</div><span class="item-cost">Custo: <span class="cost-shard">3K Fragmentos</span></span></div><div class="item-count">♾️</div>
                 </div>
             </div>
 
-            <!-- PRESTÍGIO -->
             <div class="shop-content" id="tab-prestige">
                 <div class="prestige-header">
                     <div class="prestige-title">Colapso Universal</div>
@@ -459,7 +524,6 @@
     </div>
 
     <script>
-        // O ESTADO DO JOGO AGORA INCLUI STATUS DO JOGADOR (STATS) E CONQUISTAS (ACHIEVEMENTS)
         let gameState = {
             essencia: 0, shards: 0, combo: 1, lastClickTime: Date.now(), lastSaveTime: Date.now(),
             baseClickPower: 1, baseCps: 0, odCharge: 0, odActive: false, odTimeLeft: 0,
@@ -479,19 +543,51 @@
             
             upgrades: {
                 click1: { count: 0, baseCost: 10, cost: 10, step: 1, type: 'click' },
-                auto1:  { count: 0, baseCost: 50, cost: 50, step: 1.0, type: 'auto' },
                 click2: { count: 0, baseCost: 250, cost: 250, step: 8, type: 'click' },
+                click3: { count: 0, baseCost: 2500, cost: 2500, step: 50, type: 'click' },
+                click4: { count: 0, baseCost: 15000, cost: 15000, step: 250, type: 'click' },
+                click5: { count: 0, baseCost: 100000, cost: 100000, step: 1200, type: 'click' },
+                click6: { count: 0, baseCost: 800000, cost: 800000, step: 8000, type: 'click' },
+                click7: { count: 0, baseCost: 5000000, cost: 5000000, step: 45000, type: 'click' },
+                click8: { count: 0, baseCost: 40000000, cost: 40000000, step: 300000, type: 'click' },
+                click9: { count: 0, baseCost: 350000000, cost: 350000000, step: 2500000, type: 'click' },
+                click10: { count: 0, baseCost: 3000000000, cost: 3000000000, step: 20000000, type: 'click' },
+                click11: { count: 0, baseCost: 25000000000, cost: 25000000000, step: 150000000, type: 'click' },
+                click12: { count: 0, baseCost: 250000000000, cost: 250000000000, step: 1200000000, type: 'click' },
+                
+                auto1:  { count: 0, baseCost: 50, cost: 50, step: 1.0, type: 'auto' },
                 auto2:  { count: 0, baseCost: 800, cost: 800, step: 15.0, type: 'auto' },
-                auto3:  { count: 0, baseCost: 12000, cost: 12000, step: 200.0, type: 'auto' }
+                auto3:  { count: 0, baseCost: 12000, cost: 12000, step: 200.0, type: 'auto' },
+                auto4:  { count: 0, baseCost: 150000, cost: 150000, step: 1500.0, type: 'auto' },
+                auto5:  { count: 0, baseCost: 1200000, cost: 1200000, step: 10000.0, type: 'auto' },
+                auto6:  { count: 0, baseCost: 15000000, cost: 15000000, step: 100000.0, type: 'auto' },
+                auto7:  { count: 0, baseCost: 200000000, cost: 200000000, step: 1000000.0, type: 'auto' },
+                auto8:  { count: 0, baseCost: 2500000000, cost: 2500000000, step: 12000000.0, type: 'auto' },
+                auto9:  { count: 0, baseCost: 35000000000, cost: 35000000000, step: 150000000.0, type: 'auto' },
+                auto10: { count: 0, baseCost: 500000000000, cost: 500000000000, step: 2000000000.0, type: 'auto' },
+                auto11: { count: 0, baseCost: 8000000000000, cost: 8000000000000, step: 30000000000.0, type: 'auto' },
+                auto12: { count: 0, baseCost: 150000000000000, cost: 150000000000000, step: 500000000000.0, type: 'auto' },
+                auto13: { count: 0, baseCost: 3000000000000000, cost: 3000000000000000, step: 8000000000000.0, type: 'auto' }
             },
             cosmetics: {
                 skin: { current: 'default', owned: ['default'], data: {
                     default: { cost: 0, gradient: 'linear-gradient(135deg, #00bdff 0%, #003366 40%, #7a00ff 100%)', shadow: '#00f0ff', clip: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' },
+                    ruby: { cost: 5, gradient: 'linear-gradient(135deg, #ff0055 0%, #4a0011 40%, #ff5500 100%)', shadow: '#ff0055', clip: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' },
                     emerald: { cost: 15, gradient: 'linear-gradient(135deg, #39ff14 0%, #004d1a 50%, #00ffaa 100%)', shadow: '#39ff14', clip: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' },
-                    ruby: { cost: 40, gradient: 'linear-gradient(135deg, #ff0055 0%, #4a0011 40%, #ff5500 100%)', shadow: '#ff0055', clip: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }
+                    void: { cost: 40, gradient: 'linear-gradient(135deg, #110022 0%, #330066 50%, #000000 100%)', shadow: 'rgba(157, 0, 255, 0.6)', clip: 'polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%)' },
+                    nebula: { cost: 120, gradient: 'linear-gradient(135deg, #ff00ff 0%, #ff7700 50%, #660066 100%)', shadow: 'rgba(255, 0, 255, 0.7)', clip: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' },
+                    chronos: { cost: 400, gradient: 'linear-gradient(135deg, #00ffff 0%, #ffffff 50%, #008888 100%)', shadow: 'rgba(0, 255, 255, 0.8)', clip: 'polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%)' },
+                    singularity: { cost: 1500, gradient: 'linear-gradient(135deg, #050505 0%, #1a1a1a 40%, #ff3300 100%)', shadow: 'rgba(255, 51, 0, 0.9)', clip: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' },
+                    divine: { cost: 5000, gradient: 'linear-gradient(135deg, #ffffff 0%, #ffd700 50%, #ff9900 100%)', shadow: 'rgba(255, 215, 0, 1)', clip: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' }
                 }},
                 trail: { current: 'none', owned: ['none'], data: {
-                    none: { cost: 0, color: 'transparent' }, cyber: { cost: 10, color: '#00f0ff' }, golden: { cost: 25, color: '#ffd700' }
+                    none: { cost: 0, color: 'transparent' }, 
+                    cyber: { cost: 10, color: '#00f0ff' }, 
+                    golden: { cost: 25, color: '#ffd700' },
+                    toxic: { cost: 80, color: '#39ff14' },
+                    quantum: { cost: 250, color: '#9d00ff' },
+                    solar: { cost: 800, color: '#ff4500' },
+                    infinity: { cost: 3000, color: '#ffffff' }
                 }}
             }
         };
@@ -506,19 +602,15 @@
             let savedData = localStorage.getItem('crystalOverdriveSave');
             if (savedData) {
                 let parsed = JSON.parse(savedData);
-                // Merge seguro (Garante que se adicionarmos variáveis novas no futuro, o jogo não quebra)
                 gameState = mergeDeep(gameState, parsed);
                 
-                // Cálculo de Ganhos Offline
                 let now = Date.now();
                 let diffSeconds = (now - gameState.lastSaveTime) / 1000;
                 
-                // Se ficou fora por mais de 1 minuto, recebe ganhos!
                 if (diffSeconds > 60 && getTrueCPS() > 0) {
                     let offlineEssence = diffSeconds * getTrueCPS();
                     gameState.essencia += offlineEssence;
                     
-                    // Mostra a notificação de regresso
                     setTimeout(() => {
                         showToast("Bem-vindo de volta, Comandante!", `Enquanto esteve fora, seus sistemas geraram ${formatNum(offlineEssence)} Essências!`, "⚡");
                         playBeep('overdrive');
@@ -529,7 +621,6 @@
             updateUI();
         }
 
-        // Função utilitária para merge de objetos
         function mergeDeep(target, source) {
             for (const key in source) {
                 if (source[key] instanceof Object && key in target) {
@@ -547,10 +638,8 @@
             }
         }
 
-        // Auto-save a cada 10 segundos
         setInterval(saveGame, 10000);
         window.onload = loadGame;
-
 
         // --- SISTEMA DE TOASTS (ACHIEVEMENTS) ---
         function showToast(title, desc, icon = "🏆") {
@@ -566,7 +655,6 @@
             `;
             container.appendChild(toast);
             
-            // Toca um sonzinho especial de conquista
             if(soundEnabled && audioCtx) {
                 const osc = audioCtx.createOscillator();
                 osc.type = 'square';
@@ -593,7 +681,6 @@
                 showToast(gameState.achievements.firstMillion.title, gameState.achievements.firstMillion.desc, "💰");
             }
         }
-
 
         // --- ÁUDIO SINTÉTICO ---
         let soundEnabled = false;
@@ -640,19 +727,57 @@
             }
         }
 
-        // --- CÁLCULOS E NÚMEROS ---
+        // --- CÁLCULOS E NÚMEROS DE UPGRADES E COSMÉTICOS ---
         function getTrueClick() {
             let synergyBonus = 0;
-            if (gameState.upgrades.click1.count >= 25) synergyBonus += getTrueCPS() * 0.02;
-            if (gameState.upgrades.click2.count >= 25) synergyBonus += getTrueCPS() * 0.05;
+            let cps = getTrueCPS();
             
-            let base = (gameState.baseClickPower + synergyBonus) * gameState.prestige.multiplier;
-            return base * (gameState.buff.active ? gameState.buff.multiplier : 1);
+            if (gameState.upgrades.click1.count >= 25) synergyBonus += cps * 0.02;
+            if (gameState.upgrades.click2.count >= 25) synergyBonus += cps * 0.05;
+            if (gameState.upgrades.click3.count >= 25) synergyBonus += cps * 0.08;
+            if (gameState.upgrades.click4.count >= 25) synergyBonus += cps * 0.12;
+            if (gameState.upgrades.click5.count >= 25) synergyBonus += cps * 0.18;
+            if (gameState.upgrades.click6.count >= 25) synergyBonus += cps * 0.25;
+            if (gameState.upgrades.click7.count >= 25) synergyBonus += cps * 0.35;
+            if (gameState.upgrades.click8.count >= 25) synergyBonus += cps * 0.50;
+            if (gameState.upgrades.click9.count >= 25) synergyBonus += cps * 0.70;
+            if (gameState.upgrades.click10.count >= 25) synergyBonus += cps * 1.00;
+            if (gameState.upgrades.click11.count >= 25) synergyBonus += cps * 1.50;
+            if (gameState.upgrades.click12.count >= 25) synergyBonus += cps * 2.50;
+            
+            let base = (gameState.baseClickPower + synergyBonus);
+            
+            // FUNÇÃO DA SKIN E RASTRO (Poder de Clique)
+            if (gameState.cosmetics.skin.current === 'emerald') base += gameState.baseClickPower * 0.10;
+            if (gameState.cosmetics.skin.current === 'divine') base += gameState.baseClickPower * 0.20;
+            if (gameState.cosmetics.trail.current === 'golden') base += gameState.baseClickPower * 0.05;
+            
+            let total = base * gameState.prestige.multiplier;
+            
+            if (gameState.cosmetics.trail.current === 'infinity') total *= 1.15;
+            if (gameState.buff.active) total *= gameState.buff.multiplier;
+            
+            return total;
         }
 
         function getTrueCPS() {
-            let base = gameState.baseCps * gameState.prestige.multiplier;
-            return base * (gameState.buff.active ? gameState.buff.multiplier : 1);
+            let totalCPS = 0;
+            for (let key in gameState.upgrades) {
+                if (gameState.upgrades[key].type === 'auto') {
+                    totalCPS += gameState.upgrades[key].count * gameState.upgrades[key].step;
+                }
+            }
+            
+            let multiplier = gameState.prestige.multiplier;
+            
+            // FUNÇÃO DA SKIN E RASTRO (Multiplicadores de CPS Global)
+            if (gameState.cosmetics.skin.current === 'nebula') multiplier += 0.08;
+            if (gameState.cosmetics.skin.current === 'divine') multiplier += 0.20;
+            if (gameState.cosmetics.trail.current === 'quantum') multiplier += 0.05;
+            
+            let finalCPS = totalCPS * multiplier;
+            if (gameState.buff.active) finalCPS *= gameState.buff.multiplier;
+            return finalCPS;
         }
 
         function formatNum(num) {
@@ -670,13 +795,20 @@
 
         cristal.addEventListener('click', (e) => {
             const agora = Date.now();
-            gameState.stats.totalClicks++; // Atualiza status
+            gameState.stats.totalClicks++;
             
             if (agora - gameState.lastClickTime < 400) { gameState.combo = Math.min(gameState.combo + 1, 50); } 
             else { gameState.combo = 1; }
             gameState.lastClickTime = agora;
 
-            let isCrit = Math.random() < 0.05;
+            // FUNÇÃO DA SKIN E RASTRO (Chance Crítica Adaptada)
+            let totalCritChance = 0.05;
+            if (gameState.cosmetics.skin.current === 'ruby') totalCritChance += 0.05;
+            if (gameState.cosmetics.skin.current === 'singularity') totalCritChance += 0.25;
+            if (gameState.cosmetics.trail.current === 'cyber') totalCritChance += 0.03;
+            if (gameState.cosmetics.trail.current === 'solar' && gameState.odActive) totalCritChance += 0.10;
+
+            let isCrit = Math.random() < totalCritChance;
             if (isCrit) gameState.stats.totalCrits++;
 
             let baseDmg = getTrueClick();
@@ -684,12 +816,19 @@
             let bonusCombo = Math.floor(gameState.combo / 5) * gameState.prestige.multiplier;
             
             let ganhoTotal = (baseDmg + bonusCombo) * modOD;
-            if (isCrit) ganhoTotal *= 5;
-
-            gameState.essencia += ganhoTotal;
-
-            if (isCrit) { playBeep('crit'); triggerShake('shake-active'); } 
-            else { playBeep('click'); }
+            
+            if (isCrit) {
+                // FUNÇÃO DA SKIN E RASTRO (Multiplicador de Crítico Ampliado)
+                let totalCritMultiplier = 5;
+                if (gameState.cosmetics.skin.current === 'void') totalCritMultiplier += 0.15;
+                if (gameState.cosmetics.trail.current === 'toxic') totalCritMultiplier += 0.05;
+                
+                ganhoTotal *= totalCritMultiplier;
+                playBeep('crit'); 
+                triggerShake('shake-active'); 
+            } else { 
+                playBeep('click'); 
+            }
 
             if (gameState.odActive && Math.random() < 0.15) {
                 gameState.shards += 1;
@@ -735,9 +874,14 @@
         // --- OVERDRIVE E EVENTOS ---
         function activateOverdrive() {
             gameState.odActive = true;
-            gameState.odTimeLeft = 15;
+            
+            // FUNÇÃO DA SKIN (Duração do Overdrive da Skin Chronos)
+            let duration = 15;
+            if (gameState.cosmetics.skin.current === 'chronos') duration += 3;
+            
+            gameState.odTimeLeft = duration;
             document.body.classList.add('overdrive-active');
-            document.getElementById('od-text').innerText = `OVERDRIVE: 15s`;
+            document.getElementById('od-text').innerText = `OVERDRIVE: ${gameState.odTimeLeft}s`;
             
             if (!gameState.achievements.firstOverdrive.done) {
                 gameState.achievements.firstOverdrive.done = true;
@@ -750,7 +894,7 @@
 
             let odInterval = setInterval(() => {
                 gameState.odTimeLeft--;
-                gameState.odCharge = (gameState.odTimeLeft / 15) * 100;
+                gameState.odCharge = (gameState.odTimeLeft / duration) * 100;
                 document.getElementById('od-text').innerText = `OVERDRIVE: ${gameState.odTimeLeft}s`;
                 
                 if (gameState.odTimeLeft <= 0) {
@@ -829,8 +973,7 @@
                 gameState.prestige.multiplier = 1 + (gameState.prestige.chips * 0.10);
 
                 gameState.essencia = 0; gameState.combo = 1;
-                gameState.baseClickPower = 1; gameState.baseCps = 0;
-                gameState.odCharge = 0; gameState.odActive = false;
+                gameState.baseClickPower = 1;
                 
                 for(let key in gameState.upgrades) {
                     gameState.upgrades[key].count = 0;
@@ -866,7 +1009,6 @@
                 up.cost = Math.floor(up.baseCost * Math.pow(1.15, up.count));
 
                 if (up.type === 'click') gameState.baseClickPower += up.step;
-                else gameState.baseCps += up.step;
                 
                 playBeep('click');
                 updateUI();
@@ -881,7 +1023,7 @@
                 gameState.shards -= item.cost;
                 cat.owned.push(id); cat.current = id;
                 applyVisuals(); updateUI();
-                saveGame(); // Salva ao comprar cosmético
+                saveGame();
             }
         }
 
@@ -900,7 +1042,6 @@
             document.getElementById('combo-display').innerText = gameState.combo > 4 ? `STREAK X${gameState.combo}` : '';
             document.getElementById('od-bar').style.width = `${gameState.odCharge}%`;
             
-            // Stats
             document.getElementById('stat-clicks').innerText = formatNum(gameState.stats.totalClicks);
             document.getElementById('stat-crits').innerText = formatNum(gameState.stats.totalCrits);
 
@@ -913,21 +1054,27 @@
             for (let key in gameState.upgrades) {
                 let up = gameState.upgrades[key];
                 let itemEl = document.getElementById(`upgrade-${key}`);
-                document.getElementById(`cost-${key}`).innerText = formatNum(up.cost);
-                document.getElementById(`count-${key}`).innerText = up.count;
+                if (itemEl) {
+                    document.getElementById(`cost-${key}`).innerText = formatNum(up.cost);
+                    document.getElementById(`count-${key}`).innerText = up.count;
 
-                if (gameState.essencia >= up.cost) itemEl.classList.remove('disabled');
-                else itemEl.classList.add('disabled');
+                    if (gameState.essencia >= up.cost) itemEl.classList.remove('disabled');
+                    else itemEl.classList.add('disabled');
 
-                let badge = document.getElementById(`badge-${key}`);
-                if(badge) {
-                    if(up.count >= 25) badge.style.display = 'block';
-                    else badge.style.display = 'none';
+                    let badge = document.getElementById(`badge-${key}`);
+                    if(badge) {
+                        if(up.count >= 25) badge.style.display = 'block';
+                        else badge.style.display = 'none';
+                    }
                 }
             }
 
-            ['emerald', 'ruby'].forEach(id => updateCosmItem('skin', id));
-            ['cyber', 'golden'].forEach(id => updateCosmItem('trail', id));
+            for (let id in gameState.cosmetics.skin.data) {
+                updateCosmItem('skin', id);
+            }
+            for (let id in gameState.cosmetics.trail.data) {
+                updateCosmItem('trail', id);
+            }
             
             document.querySelectorAll('.shop-item.skin-type, .shop-item.trail-type').forEach(el => el.classList.remove('equipped'));
             document.getElementById(`cosmetic-skin_${gameState.cosmetics.skin.current}`).classList.add('equipped');
@@ -949,11 +1096,13 @@
         function updateCosmItem(category, id) {
             let cat = gameState.cosmetics[category];
             let el = document.getElementById(`cosmetic-${category}_${id}`);
-            if (cat.owned.includes(id)) {
-                el.classList.remove('disabled'); el.querySelector('.item-cost').innerText = "Adquirido";
-            } else {
-                if (gameState.shards >= cat.data[id].cost) el.classList.remove('disabled');
-                else el.classList.add('disabled');
+            if (el) {
+                if (cat.owned.includes(id)) {
+                    el.classList.remove('disabled'); el.querySelector('.item-cost').innerText = "Adquirido";
+                } else {
+                    if (gameState.shards >= cat.data[id].cost) el.classList.remove('disabled');
+                    else el.classList.add('disabled');
+                }
             }
         }
 
@@ -985,7 +1134,7 @@
                 if (p.alpha <= 0) { particles.splice(i, 1); i--; continue; }
                 
                 ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color; ctx.shadowBlur = 10; ctx.shadowColor = p.color;
-                if(gameState.cosmetics.trail.current === 'golden') {
+                if(gameState.cosmetics.trail.current === 'golden' || gameState.cosmetics.trail.current === 'solar' || gameState.cosmetics.trail.current === 'infinity') {
                     ctx.beginPath(); ctx.arc(p.x, p.y, p.size/1.5, 0, Math.PI * 2); ctx.fill();
                 } else { ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); }
                 ctx.restore();
